@@ -63,10 +63,179 @@ const STORE_KEY = "azubi_tagebuch_v3";
   const setTab = (tabName) => {
     $$(".tab", tabsNav).forEach(b => b.classList.toggle("is-active", b.dataset.tab === tabName));
     panels.forEach(p => p.classList.toggle("is-active", p.id === `panel-${tabName}`));
+    if(tabName === 'glossar'){ ensureGlossaryLayout(); renderGlossary(); }
+
     // optional: focus
     const activePanel = $(`#panel-${tabName}`);
     if (activePanel) activePanel.scrollTop = 0;
   };
+
+// ---------------- Glossar (Sidebar + kumulativ nach Lehrjahr) ----------------
+const getGlossaryItems = () => {
+  const g = window.AZUBI_GLOSSARY_PRO;
+  if(!g || !Array.isArray(g.items)) return [];
+  return g.items.map(it => ({
+    term: it.term || it.title || "",
+    definition: it.definition || "",
+    praxis: it.praxis || "",
+    merksatz: it.merksatz || "",
+    fehler: it.fehler || "",
+    years: Array.isArray(it.years) ? it.years.map(Number) : []
+  }));
+};
+
+const allowedYearsUpTo = (year) => {
+  const y = Number(year || 1);
+  return [1,2,3].filter(n => n <= y);
+};
+
+const escapeHtml = (s) => String(s ?? "")
+  .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+const showGlossaryItem = (item) => {
+  const detail = document.getElementById("glossaryDetail");
+  if(!detail) return;
+  if(!item){
+    detail.innerHTML = '<div class="glossarEmpty">Wähle links einen Begriff.</div>';
+    return;
+  }
+  const years = (item.years||[]).map(String).join(", ");
+  const blocks = [
+    item.definition ? `<div class="glossarBlock"><div class="glossarBlockTitle">Definition</div><div class="glossarDef">${escapeHtml(item.definition)}</div></div>` : "",
+    item.praxis ? `<div class="glossarBlock"><div class="glossarBlockTitle">Praxis</div><div class="glossarDef">${escapeHtml(item.praxis)}</div></div>` : "",
+    item.merksatz ? `<div class="glossarBlock"><div class="glossarBlockTitle">Merksatz</div><div class="glossarDef">${escapeHtml(item.merksatz)}</div></div>` : "",
+    item.fehler ? `<div class="glossarBlock"><div class="glossarBlockTitle">Typische Fehler</div><div class="glossarDef">${escapeHtml(item.fehler)}</div></div>` : "",
+  ].join("");
+  detail.innerHTML = `
+    <h3 class="glossarTerm">${escapeHtml(item.term)}</h3>
+    <p class="glossarMeta">Lehrjahr: ${escapeHtml(years || "—")}</p>
+    ${blocks || '<div class="glossarEmpty">Keine Details hinterlegt.</div>'}
+  `;
+};
+
+const renderGlossary = () => {
+  const side = document.getElementById("glossarySidebar");
+  const search = document.getElementById("glossarySearch");
+  const year = (store && store.year) ? store.year : 1;
+
+  const all = getGlossaryItems();
+  const allowed = allowedYearsUpTo(year);
+
+  let view = all.filter(it => (it.years||[]).some(y => allowed.includes(Number(y))));
+  // Suche
+  const q = (search?.value || "").trim().toLowerCase();
+  if(q){
+    view = view.filter(it =>
+      (it.term||"").toLowerCase().includes(q) ||
+      (it.definition||"").toLowerCase().includes(q)
+    );
+  }
+  // Sort
+  view.sort((a,b)=> (a.term||"").localeCompare((b.term||""), "de", {sensitivity:"base"}));
+
+  if(!side) return;
+
+  // groups A-Z
+  const groups = new Map();
+  for(const it of view){
+    const t=(it.term||"").trim();
+    const L=(t[0]||"#").toUpperCase();
+    if(!groups.has(L)) groups.set(L, []);
+    groups.get(L).push(it);
+  }
+  const letters = Array.from(groups.keys()).sort((a,b)=>a.localeCompare(b,"de"));
+  side.innerHTML = "";
+
+  let firstItem = null;
+  for(const L of letters){
+    const wrap = document.createElement("div");
+    wrap.className = "glossarAGroup";
+    wrap.innerHTML = `<div class="glossarALetter">${L}</div>`;
+    for(const it of groups.get(L)){
+      if(!firstItem) firstItem = it;
+      const btn = document.createElement("button");
+      btn.type="button";
+      btn.className="glossarItemBtn";
+      btn.textContent = it.term;
+      btn.addEventListener("click", (ev)=>{
+        ev.preventDefault();
+        side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        store.glossarSelected = it.term;
+        saveStore();
+        showGlossaryItem(it);
+      });
+      wrap.appendChild(btn);
+    }
+    side.appendChild(wrap);
+  }
+
+  // Auto-select previous or first
+  const sel = store.glossarSelected;
+  const found = sel ? view.find(it => it.term === sel) : null;
+  const pick = found || firstItem || null;
+  showGlossaryItem(pick);
+
+  if(pick){
+    // mark active in list
+    const btns = side.querySelectorAll(".glossarItemBtn");
+    for(const b of btns){
+      if(b.textContent === pick.term){ b.classList.add("is-active"); break; }
+    }
+  }else{
+    showGlossaryItem(null);
+  }
+};
+
+// Ensure glossary sidebar markup exists (failsafe)
+const ensureGlossaryLayout = () => {
+  const panel = document.getElementById("panel-glossar");
+  if(!panel) return;
+  if(panel.querySelector("#glossarySidebar") && panel.querySelector("#glossaryDetail")) return;
+
+  const host = document.createElement("div");
+  host.className = "glossarLayout";
+  host.innerHTML = `
+    <aside class="glossarSide" aria-label="Glossar Inhaltsverzeichnis">
+      <div class="glossarSideTop">
+        <div class="glossarSideTitle">Glossar</div>
+        <div class="glossarSideHint">A–Z · kumulativ nach Lehrjahr</div>
+      </div>
+      <div class="glossarSearchWrap">
+        <input id="glossarySearch" class="input" placeholder="Begriff suchen…" />
+        <button id="btnGlossarySearch" class="btn" type="button">Suchen</button>
+      </div>
+      <div id="glossarySidebar" class="glossarSideList"></div>
+    </aside>
+    <div class="glossarMain" aria-label="Begriff">
+      <div id="glossaryDetail" class="glossarDetail">
+        <div class="glossarEmpty">Wähle links einen Begriff.</div>
+      </div>
+    </div>
+  `;
+  // clear panel body (keep header if exists)
+  const header = panel.querySelector(".panel__header");
+  panel.innerHTML = "";
+  if(header) panel.appendChild(header);
+  panel.appendChild(host);
+};
+
+// Wire "Zum Glossar" button robustly (even if something stops propagation)
+const wireOpenGlossar = () => {
+  const btn = document.getElementById("btnOpenGlossar");
+  if(btn){
+    btn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      setTab("glossar");
+      window.scrollTo({top:0, behavior:"smooth"});
+    }, true);
+  }
+};
+// --------------------------------------------------------------------------
+
+
 
   if (tabsNav) {
     tabsNav.addEventListener("click", (e) => {

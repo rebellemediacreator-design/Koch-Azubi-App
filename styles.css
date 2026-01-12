@@ -508,3 +508,13 @@ button,input,select,textarea{font:inherit}
 .glossarTerm{ font-size: 1.3rem; font-weight: 900; margin: 0 0 8px; }
 .glossarMeta{ opacity:.72; margin: 0 0 10px; }
 .glossarDef{ line-height: 1.55; white-space: pre-wrap; }
+
+.glossarSearchWrap{
+  display:flex;
+  gap:10px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.glossarSearchWrap .input{ flex:1; min-height: 42px; border-radius: 12px; border:1px solid rgba(0,0,0,.10); padding: 10px 12px; background: rgba(255,255,255,.62); }
+.glossarBlock{ margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.08); }
+.glossarBlockTitle{ font-weight: 800; margin-bottom: 6px; opacity: .85; }
