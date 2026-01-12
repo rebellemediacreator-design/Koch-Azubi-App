@@ -488,7 +488,7 @@ document.addEventListener("click", (e)=>{
       return hay.includes(q);
     });
 
-    if (glossar.count) glossar.count.textContent = `${filtered.length}`;
+    if (glossar.count) glossar.count.textContent = `${filtered.length} Begriffe`;
 
     // TOC by first letter
     const groups = {};
@@ -537,10 +537,32 @@ document.addEventListener("click", (e)=>{
     .replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
   if (glossar.search) glossar.search.addEventListener("input", renderGlossar);
+
+  // --- Glossar: optionaler "Suchen"-Button + Enter-Handling ---
+  if (glossar.search && !document.getElementById("glossarSearchBtn")) {
+    const wrap = glossar.search.closest(".field");
+    if (wrap) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn";
+      btn.id = "glossarSearchBtn";
+      btn.textContent = "Suchen";
+      btn.style.marginTop = "8px";
+      wrap.appendChild(btn);
+      btn.addEventListener("click", renderGlossar);
+    }
+    glossar.search.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); renderGlossar(); } });
+  }
+
   if (glossar.yearFilter) glossar.yearFilter.addEventListener("change", () => { saveYearFilter(); renderGlossar(); });
   const saveYearFilter = () => {
-    // keep in sync with active year unless user chooses "all"
+    // User darf "Alle" wählen; wir merken das extra.
     const y = val(glossar.yearFilter);
+    if (y) {
+      store.glossarYearFilter = String(y);
+      saveStore(store);
+    }
+    // Wenn nicht "Alle", koppeln wir Lehrjahr aktiv.
     if (y && y !== "all") setYear(y);
   };
   if (glossar.btnReset) glossar.btnReset.addEventListener("click", () => {
@@ -550,6 +572,17 @@ document.addEventListener("click", (e)=>{
   });
   if (glossar.btnPDF) glossar.btnPDF.addEventListener("click", () => toast("PDF-Export kommt als nächster Schritt."));
   if (glossar.btnCards) glossar.btnCards.addEventListener("click", () => toast("Flashcards-PDF kommt als nächster Schritt."));
+
+
+  // --- Glossar: Default an aktives Lehrjahr koppeln (statt "Alle") ---
+  if (glossar.yearFilter) {
+    const saved = store?.glossarYearFilter;
+    if (saved) {
+      glossar.yearFilter.value = saved;
+    } else if (glossar.yearFilter.value === "all" && store?.yearActive) {
+      glossar.yearFilter.value = String(store.yearActive);
+    }
+  }
 
   // initial render
   renderGlossar();
