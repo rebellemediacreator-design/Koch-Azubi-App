@@ -7,60 +7,7 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-// --- DEBUG + Hard-Wiring (keeps UI clickable even if some markup differs) ---
-window.__AZUBI_APP_LOADED__ = true;
-console.log("[Azubi-App] app.js geladen", new Date().toISOString());
-
-// Tiny debug HUD
-(function(){
-  const hud = document.createElement("div");
-  hud.id="debugHUD";
-  hud.style.position="fixed";
-  hud.style.left="12px";
-  hud.style.bottom="12px";
-  hud.style.zIndex="999999";
-  hud.style.fontFamily="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
-  hud.style.fontSize="12px";
-  hud.style.padding="10px 12px";
-  hud.style.borderRadius="12px";
-  hud.style.background="rgba(0,0,0,.78)";
-  hud.style.color="#fff";
-  hud.style.boxShadow="0 12px 30px rgba(0,0,0,.25)";
-  hud.style.maxWidth="70vw";
-  hud.innerHTML = "<b>JS: OK</b> · warte auf Klick …";
-  document.addEventListener("DOMContentLoaded", ()=>document.body.appendChild(hud));
-  window.__setHUD = (t)=>{ try{ hud.innerHTML=t; }catch(e){} };
-
-// --- Emergency delegated wiring (works even if some handlers are missing) ---
-document.addEventListener("click", (e)=>{
-  const tabBtn = e.target.closest(".tab[data-tab]");
-  if(tabBtn){
-    e.preventDefault();
-    try { setTab(tabBtn.dataset.tab); } catch(err){ console.error(err); }
-  }
-  const yearBtn = e.target.closest(".yearBtn[data-year]");
-  if(yearBtn){
-    e.preventDefault();
-    try { setYear(yearBtn.dataset.year); } catch(err){ console.error(err); }
-  }
-}, true);
-// --- END emergency ---
-
-})();
-
-// Capture clicks globally to see WHAT actually receives the click
-document.addEventListener("click", (e)=>{
-  const el = e.target;
-  const tag = el && el.tagName ? el.tagName.toLowerCase() : "?";
-  const cls = el && el.className ? String(el.className).slice(0,80) : "";
-  const id  = el && el.id ? el.id : "";
-  const txt = el && el.textContent ? el.textContent.trim().slice(0,40) : "";
-  window.__setHUD(`<b>Click</b> → ${tag}${id?("#"+id):""}${cls?(" ."+cls.replace(/\s+/g,".")):""}<br>${txt||""}`);
-}, true);
-// --- END DEBUG ---
-
-
-  const STORE_KEY = "azubi_tagebuch_v3";
+const STORE_KEY = "azubi_tagebuch_v3";
 
   const safeJSON = {
     parse(txt, fallback=null){

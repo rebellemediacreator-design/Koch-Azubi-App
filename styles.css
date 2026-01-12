@@ -448,3 +448,63 @@ button,input,select,textarea{font:inherit}
   pointer-events: none;
 }
 
+
+
+/* Kill debug HUD if it exists from older deploys */
+#debugHUD{display:none !important; pointer-events:none !important;}
+
+
+
+/* Glossar Sidebar Layout */
+.glossarLayout{
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  gap: 14px;
+  align-items:start;
+}
+@media (max-width: 980px){
+  .glossarLayout{ grid-template-columns: 1fr; }
+  .glossarSide{ order: 0; }
+  .glossarMain{ order: 1; }
+}
+.glossarSide{
+  position: sticky;
+  top: calc(var(--headerH) + var(--tabsH) + 18px);
+  max-height: calc(100vh - (var(--headerH) + var(--tabsH) + 34px));
+  overflow:auto;
+  border-radius: var(--radius);
+  background: var(--glass);
+  box-shadow: var(--shadow2);
+  border: 1px solid rgba(0,0,0,.08);
+}
+.glossarSideTop{ padding: 14px 14px 10px; border-bottom: 1px solid rgba(0,0,0,.08); }
+.glossarSideTitle{ font-weight: 800; letter-spacing: .02em; }
+.glossarSideHint{ opacity:.75; font-size: .92rem; margin-top: 4px; }
+.glossarSideList{ padding: 10px; }
+.glossarAGroup{ margin: 10px 0 14px; }
+.glossarALetter{ font-weight: 800; opacity:.8; margin: 10px 6px 6px; }
+.glossarItemBtn{
+  width: 100%;
+  text-align:left;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.55);
+  border-radius: 12px;
+  padding: 10px 10px;
+  margin: 6px 0;
+  min-height: 40px;
+  cursor: pointer;
+}
+.glossarItemBtn:hover{ transform: translateY(-1px); }
+.glossarItemBtn.is-active{ background: rgba(181,122,126,.18); border-color: rgba(181,122,126,.35); }
+.glossarMain{
+  border-radius: var(--radius);
+  background: var(--glass);
+  box-shadow: var(--shadow2);
+  border: 1px solid rgba(0,0,0,.08);
+  min-height: 420px;
+}
+.glossarDetail{ padding: 16px; }
+.glossarEmpty{ opacity:.7; padding: 10px 2px; }
+.glossarTerm{ font-size: 1.3rem; font-weight: 900; margin: 0 0 8px; }
+.glossarMeta{ opacity:.72; margin: 0 0 10px; }
+.glossarDef{ line-height: 1.55; white-space: pre-wrap; }
