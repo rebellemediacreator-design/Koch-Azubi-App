@@ -1,4 +1,120 @@
 
+// ---------------- Global Click Delegation (Buttons ALWAYS work) ----------------
+const __tabMap = {
+  "start":"start",
+  "kalender":"kalender",
+  "tag":"tag",
+  "woche":"woche",
+  "monat":"monat",
+  "notizen":"notizen",
+  "wissen":"wissen",
+  "glossar":"glossar",
+  "quiz":"quiz",
+  "prüfung":"pruefung",
+  "pruefung":"pruefung",
+  "einträge":"eintraege",
+  "eintraege":"eintraege",
+  "info":"info"
+};
+
+function __normalizeTab(raw){
+  const t = String(raw||"").trim().toLowerCase();
+  return __tabMap[t] || t;
+}
+
+document.addEventListener("click", (e)=>{
+  // Tabs (top navigation)
+  const tabBtn = e.target.closest("button.tab, .tab button, button[data-tab], [data-tab].tab");
+  if(tabBtn){
+    const dt = tabBtn.getAttribute("data-tab") || tabBtn.dataset?.tab || tabBtn.textContent;
+    const tab = __normalizeTab(dt);
+    if(typeof setTab === "function"){
+      e.preventDefault();
+      setTab(tab);
+      window.scrollTo({top:0, behavior:"smooth"});
+      return;
+    }
+  }
+
+  // Lehrjahr buttons
+  const yBtn = e.target.closest("button.yearBtn, [data-year].yearBtn, button[data-year]");
+  if(yBtn){
+    const y = yBtn.getAttribute("data-year") || yBtn.dataset?.year || yBtn.textContent;
+    if(typeof setYear === "function"){
+      e.preventDefault();
+      setYear(String(y).replace(/\D+/g,"") || "1");
+      return;
+    }
+  }
+
+  // "Zum Glossar" (fast access)
+  const openG = e.target.closest("#btnOpenGlossar, [data-action='openGlossar']");
+  if(openG){
+    if(typeof setTab === "function"){
+      e.preventDefault();
+      setTab("glossar");
+      window.scrollTo({top:0, behavior:"smooth"});
+      return;
+    }
+  }
+
+  // Glossary A–Z bar
+  const az = e.target.closest(".azBtn");
+  if(az){
+    const L = az.textContent.trim();
+    const target = document.querySelector(`[data-letter-anchor="${CSS.escape(L)}"]`);
+    if(target){
+      e.preventDefault();
+      target.scrollIntoView({behavior:"smooth", block:"start"});
+      return;
+    }
+  }
+
+  // Glossary item click (delegated)
+  const gBtn = e.target.closest(".glossarItemBtn");
+  if(gBtn){
+    const term = gBtn.getAttribute("data-term") || gBtn.textContent.trim();
+    const all = (window.__GLOSSARY_VIEW__ || []);
+    const item = all.find(it => (it.term||"") === term) || null;
+    const side = document.getElementById("glossarySidebar");
+    if(side) side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
+    gBtn.classList.add("is-active");
+    if(item && typeof showGlossaryItem === "function"){
+      e.preventDefault();
+      store.glossarSelected = item.term;
+      if(typeof saveStore === "function") saveStore();
+      showGlossaryItem(item);
+      return;
+    }
+  }
+
+  // Begriff → Glossar-Notizen
+  const toNotes = e.target.closest("#btnToGlossarNotes");
+  if(toNotes){
+    e.preventDefault();
+    const term = (store && store.glossarSelected) ? store.glossarSelected : "";
+    if(!term) return;
+    const def = (window.__GLOSSARY_VIEW__||[]).find(it => (it.term||"")===term);
+    const insert = `• ${term} – ${def && def.definition ? def.definition : ""}\n  Mein Beispiel: `;
+    const ta = document.querySelector(
+      'textarea[name="glossarNotes"], textarea#glossarNotes, textarea[data-field="glossarNotes"], textarea[placeholder*="Begriff("], textarea[placeholder*="Begriff(e)"]'
+    );
+    if(ta){
+      if(!ta.value.includes(term)) ta.value = (ta.value ? ta.value.trimEnd()+"\n\n" : "") + insert;
+      ta.focus();
+      try{ store.glossarNotes = ta.value; if(typeof saveStore === "function") saveStore(); }catch(_){}
+      if(typeof setTab === "function") setTab("start");
+    }else{
+      navigator.clipboard?.writeText(insert).catch(()=>{});
+      alert("Notizfeld nicht gefunden. Text wurde in die Zwischenablage kopiert.");
+    }
+    return;
+  }
+
+}, true);
+// -----------------------------------------------------------------------------
+
+
 /* app.js – Azubi Tagebuch Küche
    Fix: komplette UI-Verkabelung (Tabs, Lehrjahr, Storage, Export/Import)
    + Glossar Render + Quiz/Prüfung auf Basis Glossar-Pool (window.AZUBI_GLOSSARY_PRO)
