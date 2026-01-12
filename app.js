@@ -134,6 +134,8 @@ const renderGlossary = () => {
   // Sort
   view.sort((a,b)=> (a.term||"").localeCompare((b.term||""), "de", {sensitivity:"base"}));
 
+  window.__GLOSSARY_VIEW__ = view;
+
   if(!side) return;
 
   // groups A-Z
@@ -158,9 +160,8 @@ const renderGlossary = () => {
       btn.type="button";
       btn.className="glossarItemBtn";
       btn.textContent = it.term;
-      btn.addEventListener("click", (ev)=>{
-        ev.preventDefault();
-        side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
+      btn.setAttribute('data-term', it.term);
+      side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
         btn.classList.add("is-active");
         store.glossarSelected = it.term;
         saveStore();
@@ -225,9 +226,7 @@ const ensureGlossaryLayout = () => {
 const wireOpenGlossar = () => {
   const btn = document.getElementById("btnOpenGlossar");
   if(btn){
-    btn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      e.stopPropagation();
+    e.stopPropagation();
       setTab("glossar");
       window.scrollTo({top:0, behavior:"smooth"});
     }, true);
@@ -665,8 +664,7 @@ const wireOpenGlossar = () => {
       btn.textContent = "Suchen";
       btn.style.marginTop = "8px";
       wrap.appendChild(btn);
-      btn.addEventListener("click", renderGlossar);
-    }
+      }
     glossar.search.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); renderGlossar(); } });
   }
 

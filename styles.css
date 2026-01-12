@@ -518,3 +518,20 @@ button,input,select,textarea{font:inherit}
 .glossarSearchWrap .input{ flex:1; min-height: 42px; border-radius: 12px; border:1px solid rgba(0,0,0,.10); padding: 10px 12px; background: rgba(255,255,255,.62); }
 .glossarBlock{ margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.08); }
 .glossarBlockTitle{ font-weight: 800; margin-bottom: 6px; opacity: .85; }
+
+
+
+/* Contrast boost for readability */
+.glossarSide, .glossarMain{
+  background: rgba(255,255,255,.86) !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+}
+.glossarDetail{ color: var(--ink); }
+.glossarDef{ color: rgba(26,26,26,.92); }
+.glossarMeta{ color: rgba(26,26,26,.70); }
+.glossarItemBtn{
+  background: rgba(255,255,255,.90) !important;
+}
+.glossarItemBtn.is-active{
+  background: rgba(188,158,129,.28) !important;
+}
