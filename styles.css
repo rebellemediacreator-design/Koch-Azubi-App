@@ -535,3 +535,37 @@ button,input,select,textarea{font:inherit}
 .glossarItemBtn.is-active{
   background: rgba(188,158,129,.28) !important;
 }
+
+
+
+/* A–Z Schnellleiste */
+.glossarAZ{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  padding: 10px 14px 12px;
+}
+.azBtn{
+  border: 1px solid rgba(0,0,0,.10);
+  background: rgba(255,255,255,.85);
+  border-radius: 999px;
+  padding: 6px 10px;
+  min-height: 34px;
+  cursor:pointer;
+  font-weight: 700;
+  font-size: .9rem;
+}
+.azBtn:hover{ transform: translateY(-1px); }
+
+.glossarDetailActions{
+  position: sticky;
+  bottom: 0;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  padding: 10px 14px 14px;
+  background: rgba(255,255,255,.86);
+  border-top: 1px solid rgba(0,0,0,.08);
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}

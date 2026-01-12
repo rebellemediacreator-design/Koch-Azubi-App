@@ -89,6 +89,30 @@ const allowedYearsUpTo = (year) => {
   return [1,2,3].filter(n => n <= y);
 };
 
+const renderAZBar = (letters) => {
+  const az = document.getElementById('glossaryAZ');
+  if(!az) return;
+  az.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for(const L of letters){
+    const b = document.createElement('button');
+    b.type='button';
+    b.className='azBtn';
+    b.textContent=L;
+    b.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const target = document.querySelector(`[data-letter-anchor="${CSS.escape(L)}"]`);
+      if(target){
+        target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    });
+    frag.appendChild(b);
+  }
+  az.appendChild(frag);
+};
+
+
+
 const escapeHtml = (s) => String(s ?? "")
   .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
   .replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -148,12 +172,13 @@ const renderGlossary = () => {
   }
   const letters = Array.from(groups.keys()).sort((a,b)=>a.localeCompare(b,"de"));
   side.innerHTML = "";
+  try{ renderAZBar(letters); }catch(e){}
 
   let firstItem = null;
   for(const L of letters){
     const wrap = document.createElement("div");
     wrap.className = "glossarAGroup";
-    wrap.innerHTML = `<div class="glossarALetter">${L}</div>`;
+    wrap.innerHTML = `<div class="glossarALetter" data-letter-anchor="${L}">${L}</div>`;
     for(const it of groups.get(L)){
       if(!firstItem) firstItem = it;
       const btn = document.createElement("button");
@@ -202,6 +227,7 @@ const ensureGlossaryLayout = () => {
       <div class="glossarSideTop">
         <div class="glossarSideTitle">Glossar</div>
         <div class="glossarSideHint">A–Z · kumulativ nach Lehrjahr</div>
+        <div id="glossaryAZ" class="glossarAZ"></div>
       </div>
       <div class="glossarSearchWrap">
         <input id="glossarySearch" class="input" placeholder="Begriff suchen…" />
@@ -212,6 +238,9 @@ const ensureGlossaryLayout = () => {
     <div class="glossarMain" aria-label="Begriff">
       <div id="glossaryDetail" class="glossarDetail">
         <div class="glossarEmpty">Wähle links einen Begriff.</div>
+      </div>
+      <div class="glossarDetailActions">
+        <button id="btnToGlossarNotes" class="btn" type="button">Begriff → Glossar-Notizen</button>
       </div>
     </div>
   `;
