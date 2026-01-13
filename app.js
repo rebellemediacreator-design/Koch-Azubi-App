@@ -123,6 +123,42 @@ document.addEventListener("click", (e)=>{
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
+
+  // Header shrink on scroll (only height/spacing, no redesign)
+  const __applyHeaderShrink = () => {
+    const topbar = document.querySelector(".topbar");
+    const __syncTopbarH = () => {
+      if(!topbar) return;
+      const h = topbar.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--topbarH', h + 'px');
+    };
+    const __setTopbarH = () => {
+      const h = topbar.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty('--topbarH', h + 'px');
+    };
+    if(!topbar) return;
+    // Ensure CSS exists even if inline fallback is active
+    if(!document.getElementById("hdrShrinkStyles")){
+      const st = document.createElement("style");
+      st.id = "hdrShrinkStyles";
+      st.textContent = ".topbar.is-scrolled .brand{padding:8px 16px 6px;}\n" +
+                     ".topbar.is-scrolled .topbar__row{padding:0 16px 8px;}\n" +
+                     ".topbar.is-scrolled .topbar__actions{padding:0 16px 10px;}";
+      document.head.appendChild(st);
+    }
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      topbar.classList.toggle("is-scrolled", y > 8);
+      __setTopbarH();
+    };
+    window.addEventListener("scroll", onScroll, {passive:true});
+    window.addEventListener("resize", __setTopbarH, {passive:true});
+    onScroll();
+    __syncTopbarH();
+  };
+  // Defer one tick to ensure DOM exists (defer scripts still run before styles sometimes)
+  setTimeout(__applyHeaderShrink, 0);
+
 const STORE_KEY = "azubi_tagebuch_v3";
 
   const safeJSON = {
@@ -302,7 +338,8 @@ const renderGlossary = () => {
       btn.className="glossarItemBtn";
       btn.textContent = it.term;
       btn.setAttribute('data-term', it.term);
-      side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
+      btn.addEventListener("click", ()=>{
+        side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
         btn.classList.add("is-active");
         store.glossarSelected = it.term;
         saveStore();
@@ -370,12 +407,13 @@ const ensureGlossaryLayout = () => {
 // Wire "Zum Glossar" button robustly (even if something stops propagation)
 const wireOpenGlossar = () => {
   const btn = document.getElementById("btnOpenGlossar");
-  if(btn){
+  if(!btn) return;
+  btn.addEventListener("click", (e)=>{
+    e.preventDefault();
     e.stopPropagation();
-      setTab("glossar");
-      window.scrollTo({top:0, behavior:"smooth"});
-    }, true);
-  }
+    if(typeof setTab === "function") setTab("glossar");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }, true);
 };
 // --------------------------------------------------------------------------
 

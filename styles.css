@@ -106,7 +106,7 @@ button,input,select,textarea{font:inherit}
 
 /* Tabs */
 .tabs{
-  position:sticky; top: calc(0px + 0px);
+  position:sticky; top: var(--topbarH, 0px);
   z-index:49;
   background: rgba(238,236,228,.86);
   backdrop-filter: blur(10px);
@@ -587,3 +587,9 @@ body.is-compact .btn{height:36px}
 .brand, .topbar__row, .topbar__actions{transition: padding .18s ease}
 .brand__subtitle{transition: opacity .18s ease}
 .yearBtn, .tab, .stat{transition: all .18s ease}
+
+
+/* Header shrink on scroll (minimal) */
+.topbar.is-scrolled .brand{padding:8px 16px 6px;}
+.topbar.is-scrolled .topbar__row{padding:0 16px 8px;}
+.topbar.is-scrolled .topbar__actions{padding:0 16px 10px;}
