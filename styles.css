@@ -320,11 +320,12 @@ button,input,select,textarea{font:inherit}
 
 /* Footer */
 .footer{
-  background: rgba(107,89,69,.92);
+  background: rgba(107,89,69,.86);
   color: rgba(238,236,228,.96);
-  padding:18px 16px;
+  padding:12px 16px;
   border-top:1px solid rgba(238,236,228,.10);
 }
+
 .footer__wrap{max-width:var(--maxw); margin:0 auto}
 .footer__note{font-weight:900}
 .footer__sub{margin-top:6px; font-size:12px; opacity:.9}
@@ -570,4 +571,19 @@ button,input,select,textarea{font:inherit}
   border-bottom-right-radius: var(--radius);
 }
 
-#buildBadge{position:fixed;right:12px;bottom:12px;z-index:999999;padding:8px 10px;border-radius:12px;font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:rgba(0,0,0,.72);color:#fff;letter-spacing:.02em;pointer-events:none;}
+
+/* --- Compact header on scroll (adds body.is-compact) --- */
+body.is-compact .brand{padding:8px 16px 6px}
+body.is-compact .brand__subtitle{display:none}
+body.is-compact .topbar__row{padding:0 16px 8px}
+body.is-compact .yearBtn{height:34px; padding:0 10px; font-size:13px}
+body.is-compact .stat{padding:6px 10px; min-width:78px}
+body.is-compact .tab{height:36px; padding:0 10px; font-size:14px}
+body.is-compact .tabs{padding:8px 10px}
+body.is-compact .topbar__actions{padding:0 16px 10px}
+body.is-compact .btn{height:36px}
+
+/* smooth compact transitions */
+.brand, .topbar__row, .topbar__actions{transition: padding .18s ease}
+.brand__subtitle{transition: opacity .18s ease}
+.yearBtn, .tab, .stat{transition: all .18s ease}
