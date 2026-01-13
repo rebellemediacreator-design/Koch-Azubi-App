@@ -1,4 +1,16 @@
 
+// --- Build Badge ---
+window.__BUILD_ID__ = "FINAL6-20260113-052931";
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    const b=document.createElement("div");
+    b.id="buildBadge";
+    b.textContent="Build: FINAL6-20260113-052931";
+    document.body.appendChild(b);
+  } catch(e) {}
+});
+
+
 // ---------------- Global Click Delegation (Buttons ALWAYS work) ----------------
 const __tabMap = {
   "start":"start",
@@ -275,7 +287,6 @@ const renderGlossary = () => {
   view.sort((a,b)=> (a.term||"").localeCompare((b.term||""), "de", {sensitivity:"base"}));
 
   window.__GLOSSARY_VIEW__ = view;
-  window.__GLOSSARY_MAP__ = new Map(view.map(it => [String(it.term||'').trim().toLowerCase(), it]));
 
   if(!side) return;
 
@@ -299,18 +310,26 @@ const renderGlossary = () => {
     for(const it of groups.get(L)){
       if(!firstItem) firstItem = it;
       const btn = document.createElement("button");
-      btn.type="button";
-      btn.className="glossarItemBtn";
+      btn.type = "button";
+      btn.className = "glossarItemBtn";
       btn.textContent = it.term;
-      btn.setAttribute('data-term', it.term);
-      side.querySelectorAll(".glossarItemBtn.is-active").forEach(x=>x.classList.remove("is-active"));
+      btn.setAttribute("data-term", it.term);
+
+      btn.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const sideEl = document.getElementById("glossarySidebar");
+        if (sideEl) sideEl.querySelectorAll(".glossarItemBtn.is-active").forEach(x => x.classList.remove("is-active"));
         btn.classList.add("is-active");
+
         store.glossarSelected = it.term;
-        saveStore();
+        try { saveStore(); } catch (e) {}
         showGlossaryItem(it);
-      });
+      }, true);
+
       wrap.appendChild(btn);
-    }
+}
     side.appendChild(wrap);
   }
 
