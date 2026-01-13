@@ -569,3 +569,5 @@ button,input,select,textarea{font:inherit}
   border-bottom-left-radius: var(--radius);
   border-bottom-right-radius: var(--radius);
 }
+
+#buildBadge{position:fixed;right:12px;bottom:12px;z-index:999999;padding:8px 10px;border-radius:12px;font:12px/1.2 system-ui,Segoe UI,Roboto,Arial;background:rgba(0,0,0,.72);color:#fff;pointer-events:none;}

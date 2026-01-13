@@ -275,6 +275,7 @@ const renderGlossary = () => {
   view.sort((a,b)=> (a.term||"").localeCompare((b.term||""), "de", {sensitivity:"base"}));
 
   window.__GLOSSARY_VIEW__ = view;
+  window.__GLOSSARY_MAP__ = new Map(view.map(it => [String(it.term||'').trim().toLowerCase(), it]));
 
   if(!side) return;
 
