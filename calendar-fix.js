@@ -180,11 +180,17 @@
         
         localStorage.setItem(storeKey, JSON.stringify(store));
         
-        // Zum Tag-Tab wechseln
-        if (typeof setTab === 'function') {
-          setTab('tag');
+        // Zum Tag-Tab wechseln - Klicke direkt auf den Tab-Button
+        const tagTabBtn = document.querySelector('button[data-tab="tag"]') || 
+                          Array.from(document.querySelectorAll('button')).find(btn => 
+                            btn.textContent.trim().toLowerCase() === 'tag'
+                          );
+        
+        if (tagTabBtn) {
+          tagTabBtn.click();
+          console.log('[Calendar Fix] Switched to Tag tab');
         } else {
-          console.warn('[Calendar Fix] setTab function not found');
+          console.warn('[Calendar Fix] Tag tab button not found');
         }
         
         // Toast-Benachrichtigung
