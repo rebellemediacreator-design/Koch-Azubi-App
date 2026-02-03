@@ -94,10 +94,28 @@
   cursor: pointer;
 }
 
-.glossarSideList {
-  flex: 1;
+.glossarList {
+  max-height: calc(100vh - 450px);
   overflow-y: auto;
   padding: 8px;
+}
+
+.glossarList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.glossarList::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.glossarList::-webkit-scrollbar-thumb {
+  background: rgba(107, 89, 69, 0.3);
+  border-radius: 4px;
+}
+
+.glossarList::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 89, 69, 0.5);
 }
 
 .glossarAGroup {

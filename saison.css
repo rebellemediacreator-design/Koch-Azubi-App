@@ -1,0 +1,203 @@
+/* ============================================================================
+   SAISON-KALENDER STYLES (angepasst an App-Design)
+   ============================================================================ */
+
+/* Month Selection */
+.saisonMonthSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.saisonMonthBtn {
+  flex: 1 1 calc(25% - 8px);
+  min-width: 70px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(107, 89, 69, 0.22);
+  background: rgba(238, 236, 228, 0.75);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saisonMonthBtn:hover {
+  background: rgba(210, 202, 191, 0.75);
+}
+
+.saisonMonthBtn.is-active {
+  background: var(--camel);
+  border-color: rgba(107, 89, 69, 0.25);
+}
+
+/* Category Selection */
+.saisonCategorySelector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.saisonCategoryBtn {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 89, 69, 0.22);
+  background: rgba(238, 236, 228, 0.80);
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow2);
+}
+
+.saisonCategoryBtn:hover {
+  background: rgba(210, 202, 191, 0.75);
+}
+
+.saisonCategoryBtn.is-active {
+  background: var(--camel);
+  border-color: rgba(107, 89, 69, 0.25);
+}
+
+/* Content Area */
+#saisonContent {
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+}
+
+/* Scrollbar Styling */
+#saisonContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+#saisonContent::-webkit-scrollbar-track {
+  background: rgba(107, 89, 69, 0.05);
+  border-radius: 4px;
+}
+
+#saisonContent::-webkit-scrollbar-thumb {
+  background: rgba(107, 89, 69, 0.3);
+  border-radius: 4px;
+}
+
+#saisonContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 89, 69, 0.5);
+}
+
+/* Cards - identisch zu .entry aus styles.css */
+.saisonCard {
+  border-radius: 16px;
+  border: 1px solid rgba(107, 89, 69, 0.14);
+  background: rgba(255, 255, 255, 0.60);
+  padding: 14px;
+  box-shadow: var(--shadow2);
+  margin-bottom: 10px;
+}
+
+.saisonCard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.saisonCard__title {
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.saisonCard__badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge--hochsaison {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  color: #333;
+}
+
+.badge--season {
+  background: rgba(102, 126, 234, 0.3);
+  color: var(--ink);
+  border: 1px solid rgba(102, 126, 234, 0.5);
+}
+
+.badge--bio {
+  background: rgba(76, 175, 80, 0.3);
+  color: var(--ink);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.saisonCard__meta {
+  font-size: 13px;
+  color: var(--ink);
+  opacity: 0.78;
+  margin-top: 4px;
+}
+
+.saisonCard__meta div {
+  margin-bottom: 4px;
+}
+
+.saisonCard__meta strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.saisonCard__gerichte,
+.saisonCard__info,
+.saisonCard__bio {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(107, 89, 69, 0.12);
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.saisonCard__gerichte strong,
+.saisonCard__info strong,
+.saisonCard__bio strong {
+  color: var(--ink);
+  font-weight: 900;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Empty State */
+.saisonEmpty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink);
+  opacity: 0.65;
+  font-size: 16px;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .saisonMonthBtn {
+    flex: 1 1 calc(33.333% - 8px);
+    min-width: 60px;
+    font-size: 13px;
+  }
+  
+  .saisonCategoryBtn {
+    font-size: 14px;
+  }
+}

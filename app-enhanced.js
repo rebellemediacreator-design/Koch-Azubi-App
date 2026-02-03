@@ -249,6 +249,14 @@ document.addEventListener("click", (e)=>{
     
     $$(".yearBtn").forEach(b => b.classList.toggle("is-active", b.dataset.year === y));
     
+    // Automatisch Wissens-Tab öffnen und Lehrjahr anzeigen
+    setTab("wissen");
+    
+    // Wissens-Modul über Lehrjahr informieren
+    if (window.WissenModule && typeof window.WissenModule.setYear === 'function') {
+      window.WissenModule.setYear(parseInt(y));
+    }
+    
     // Update active tab content
     const activePanel = $(".panel.is-active");
     if(activePanel?.id === "panel-glossar") renderGlossary();
@@ -546,6 +554,31 @@ document.addEventListener("click", (e)=>{
       }
       if (els.progress) els.progress.textContent = `${deck.length}/${deck.length}`;
       if (els.next) els.next.disabled = true;
+      
+      // API-Integration: Quiz-Ergebnis an Ausbilder-App senden
+      if (window.AzubiAPI) {
+        const yearSelect = els.year?.value || 'all';
+        const trainingYear = yearSelect === 'all' ? 1 : parseInt(yearSelect);
+        
+        window.AzubiAPI.sendQuizResult({
+          trainingYear: trainingYear,
+          questionCount: deck.length,
+          correctAnswers: score,
+          score: Math.round(score * 100 / deck.length),
+          passed: score >= Math.ceil(deck.length * 0.7),
+          duration: null,
+        }).then(result => {
+          if (result.success) {
+            console.log('[Quiz] ✅ Ergebnis erfolgreich gesendet');
+            // Toast wird bereits von api-client.js angezeigt
+          } else {
+            console.log('[Quiz] 💾 Ergebnis wird später synchronisiert');
+            // Toast wird bereits von api-client.js angezeigt
+          }
+        }).catch(error => {
+          console.error('[Quiz] ❌ Fehler beim Senden:', error);
+        });
+      }
     };
 
     const start = (onlyWrong=false) => {

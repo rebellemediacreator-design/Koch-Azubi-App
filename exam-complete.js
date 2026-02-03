@@ -286,6 +286,39 @@
 
     // Show result screen
     showScreen('result');
+    
+    // API-Integration: Prüfungs-Ergebnis an Ausbilder-App senden
+    if (window.AzubiAPI) {
+      const duration = Math.floor((Date.now() - examState.startTime) / 1000);
+      const timeLimit = examConfig[examState.year].timeLimit * 60;
+      
+      window.AzubiAPI.sendExamResult({
+        trainingYear: examState.year,
+        simulationNumber: 1, // TODO: Simulation-Nummer aus UI holen
+        questionCount: total,
+        correctAnswers: score,
+        score: percent,
+        passed: passed,
+        duration: duration,
+        timeLimit: timeLimit,
+        wrongAnswers: examState.wrong.map(w => ({
+          questionNumber: w.index || 0,
+          question: w.term,
+          correctAnswer: w.definition,
+          userAnswer: w.selectedAnswer,
+        })),
+      }).then(result => {
+        if (result.success) {
+          console.log('[Prüfung] ✅ Ergebnis erfolgreich gesendet');
+          // Toast wird bereits von api-client.js angezeigt
+        } else {
+          console.log('[Prüfung] 💾 Ergebnis wird später synchronisiert');
+          // Toast wird bereits von api-client.js angezeigt
+        }
+      }).catch(error => {
+        console.error('[Prüfung] ❌ Fehler beim Senden:', error);
+      });
+    }
   };
 
   // ========================================================================
